@@ -1,0 +1,17 @@
+Node developer prevent maclious attacks
+
+1.	选用eslint-plugin-security, 来自动检测unsafe 的写法比如eval ，malicious regex , module loading 用路径而不是直接用variable等，让代码变成linter强壮。
+2.	对于dependencies 出现容易攻击的漏洞，用snyk 或者nsp 来inspect, update latest version；
+3.	防御DOS暴力攻击和brute attack， server 不应该处理这个，因为有firewall，firewall 可以防止DOS攻击，如果一旦频繁发生，就要limit request using middleware, 插件包含express-rate-limit, 原理就是设定limiter, 比如强制15分钟只能发送100个requests, 然后app.use(limiter)
+4.	如果不用该插件，可以强制设置process should crash for unhandled error. 
+5.	SQL/NoSQL injection 在mongoose 已经被防范
+6.	防御CSRF等攻击需要采用http-only cookies, node.js 告诉Express： res.cookie('sessionid', '1', { httpOnly: true });
+7.	处理password 或者API keys, 用secure hashed : Bcrypt 不能使用crypto，
+8.	对于json 要用jsonschema 来做validator 来处理
+9.	如果用Docker container, 会导致node.js runs as root user, 所以需要在Docker 添加 “-u username” 的flag
+10.	Limit payload size using a reverse-proxy, 利用express-body parse 设定接收的payload size。  
+11.	Client side error 不要有status code和详细的信息。
+12.	使用 两步2-factor认证机制MFA, 
+13.	尽量不要使用Basic authentication, 使用OAuth，OpenID, JWT 等等。
+14.	定期rotate password 和 API keys， SSH keys 等等。
+15.	添加输错密码在规定时间内禁止访问，而且提示用户名或者密码有问题，不要单独说明。
